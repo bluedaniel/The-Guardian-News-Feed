@@ -11,7 +11,7 @@ The Guardian News Feed plug-in enables you to publish articles by the Guardian d
 
 == Description ==
 
-You can contribute to the development over at Github - <a href="http://groups.google.com/group/guardian-api-talk">https://github.com/bluedaniel/The-Guardian-News-Feed</a>.
+You can contribute to the development over at Github - <a href="https://github.com/bluedaniel/The-Guardian-News-Feed">https://github.com/bluedaniel/The-Guardian-News-Feed</a>.
 
 This plugin enables you to publish Guardian articles directly to your blog.
 
