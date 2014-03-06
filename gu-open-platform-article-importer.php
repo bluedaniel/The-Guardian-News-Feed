@@ -72,11 +72,6 @@ function Guardian_ContentAPI_admin_page() {
         <h2>The Guardian News Feed</h2>
 
         <?php
-
-        $publishing_guidelines = Guardian_Dynamic_Text();
-        ?>
-
-        <?php
         $api = new GuardianOpenPlatformAPI();
 
         $str_api_key = get_option ( 'guardian_api_key' );
@@ -161,7 +156,22 @@ function Guardian_ContentAPI_admin_page() {
                 <div id="postbox-container-1" class="postbox-container">
                     <div id="side-info-column" class="inner-sidebar">
                         <div id="side-sortables" class="meta-box-sortables ui-sortable">
-                            <?php echo render_publishing_message($publishing_guidelines); ?>
+
+                            <div id="submitdiv" class="postbox">
+                                <h3 class="hndle"><span>Publishing Guidelines</span></h3>
+                                <div class="misc-pub-section">
+                                    <p>We know you studied the <a href="http://www.guardian.co.uk/open-platform/terms-and-conditions" target="_blank">legal agreement</a> carefully, but here are some important reminders:</p>
+                                    <ol>
+                                        <li><strong>Changes:</strong> You mustn't remove or alter the text, links or images you get from us.</li>
+                                        <li><strong>Key:</strong> If you don't have a key, get one <a href="http://www.guardian.co.uk/open-platform" target="_blank">here</a>. It's required. If you do have one, please don't share it or use it anywhere else.</li>
+                                        <li><strong>Ads:</strong> Articles come with ads and performance tracking embedded in them. As above, you mustn't change or remove them. You can, of course, use your own ads elsewhere on your blog, too.</li>
+                                        <li><strong>Deletions:</strong> Sometimes but very rarely we have to remove articles. When that happens, this plug-in will replace the withdrawn Guardian content within your blog post with a message saying that the content is not available anymore.</li>
+                                    </ol>
+                                    <p>If you want to know more, please read the <a href="http://www.guardian.co.uk/open-platform/faq" target="_blank">FAQ</a> or post questions to our <a href="http://groups.google.com/group/guardian-api-talk/" target="_blank">Google Group</a>.</p>
+                                    <p>This plug-in is designed to be used as is.  We have several ways of working with partners if you want to do something that varies from our standard terms. Find out more here: <a href="http://www.guardian.co.uk/open-platform" target="_blank">http://www.guardian.co.uk/open-platform</a></p>
+                                </div>
+                            </div>
+
                             <?php echo render_refinements($articles); ?>
                         </div>
                     </div>
@@ -296,24 +306,6 @@ function Guardian_Published_Already ($str_item_id) {
     global $wpdb;
     $article_exist = $wpdb->get_row("SELECT * FROM $wpdb->postmeta WHERE meta_key = 'guardian_content_api_id' AND meta_value = '{$str_item_id}' LIMIT 1");
     return $article_exist;
-}
-
-/*
- * Function to retrieve the publishing guidelines as well as display updates about the API.
- */
-function Guardian_Dynamic_Text() {
-
-    $file = wp_remote_retrieve_body( wp_remote_get('http://static.guim.co.uk/openplatform/wp-plugin/'.str_replace('.', '-', get_option('GUARDIAN_NEWS_FEED_VERSION')).'.txt') );
-    $file_arr = explode('=====', $file);
-
-    $publishing_guidelines = $file_arr[0];
-    $update_message = str_replace('{plugins_url}', admin_url("plugins.php"), $file_arr[1]);
-
-    if (!empty($update_message)) {
-        echo "<div class=\"updated\">{$update_message}</div>";
-    }
-
-    return $publishing_guidelines;
 }
 
 /**
@@ -548,22 +540,6 @@ function render_refinements($articles) {
             $output[] = "		</div>";
         }
     }
-    return implode( "\n", $output );
-}
-
-/*
- * This function renders the user message on the right hand side.
- *
- */
-function render_publishing_message($publishing_guidelines) {
-
-    $output[] = "		<div id=\"submitdiv\" class=\"postbox\">";
-    $output[] = "			<h3 class=\"hndle\" ><span>Publishing Guidelines</span></h3>";
-    $output[] = "			<div class=\"misc-pub-section\">";
-    $output[] = "				{$publishing_guidelines}";
-    $output[] = "			</div>";
-    $output[] = "		</div>";
-
     return implode( "\n", $output );
 }
 
