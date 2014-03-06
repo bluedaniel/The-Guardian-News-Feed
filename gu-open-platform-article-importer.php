@@ -329,27 +329,28 @@ function render_contentapi_search($arr_related_content) {
     global $s, $tag, $section, $page, $safe_url;
 
     $arr_html_output = array ();
+    if($arr_related_content['results']) {
+        foreach ( $arr_related_content['results'] as $related_content ) {
 
-    foreach ( $arr_related_content['results'] as $related_content ) {
+            $description = $related_content ['fields'] ['standfirst'];
+            if (empty($description)) {
+                $description = $related_content ['fields'] ['trailText'];
+            }
+            $image = '';
+            if (!empty($related_content ['fields'] ['thumbnail'])) {
+                $image = "<img src=\"{$related_content ['fields'] ['thumbnail']}\" width=\"140\" height=\"84\" style=\"padding:5px 0;\" alt=\"{$related_content ['fields'] ['headline']}\">";
+            }
+            $link = "{$safe_url}?page={$page}&s={$s}&tag={$tag}&section={$section}&contentid={$related_content ['id']}";
 
-        $description = $related_content ['fields'] ['standfirst'];
-        if (empty($description)) {
-            $description = $related_content ['fields'] ['trailText'];
+            $arr_html_output [] = "		<tr>";
+            $arr_html_output [] = "			<td class=\"thumb\">{$image}</td>";
+            $arr_html_output [] = "			<td class=\"name\"><a href=\"{$related_content ['webUrl']}\" alt=\"{$related_content ['fields'] ['headline']}\" title=\"{$related_content ['fields'] ['headline']}\" target=\"_blank\">{$related_content ['fields'] ['headline']}</a></td>";
+            $arr_html_output [] = "			<td class=\"vers\">".date("j/m/Y", strtotime($related_content ['webPublicationDate']))."</td>";
+            $arr_html_output [] = "			<td class=\"desc\">{$description}</td>";
+            $arr_html_output [] = "			<td class=\"action-links\">";
+            $arr_html_output [] = "			<a href=\"{$link}\" alt=\"Save to Drafts\">Save to Drafts</a></td>";
+            $arr_html_output [] = "		</tr>";
         }
-        $image = '';
-        if (!empty($related_content ['fields'] ['thumbnail'])) {
-            $image = "<img src=\"{$related_content ['fields'] ['thumbnail']}\" width=\"140\" height=\"84\" style=\"padding:5px 0;\" alt=\"{$related_content ['fields'] ['headline']}\">";
-        }
-        $link = "{$safe_url}?page={$page}&s={$s}&tag={$tag}&section={$section}&contentid={$related_content ['id']}";
-
-        $arr_html_output [] = "		<tr>";
-        $arr_html_output [] = "			<td class=\"thumb\">{$image}</td>";
-        $arr_html_output [] = "			<td class=\"name\"><a href=\"{$related_content ['webUrl']}\" alt=\"{$related_content ['fields'] ['headline']}\" title=\"{$related_content ['fields'] ['headline']}\" target=\"_blank\">{$related_content ['fields'] ['headline']}</a></td>";
-        $arr_html_output [] = "			<td class=\"vers\">".date("j/m/Y", strtotime($related_content ['webPublicationDate']))."</td>";
-        $arr_html_output [] = "			<td class=\"desc\">{$description}</td>";
-        $arr_html_output [] = "			<td class=\"action-links\">";
-        $arr_html_output [] = "			<a href=\"{$link}\" alt=\"Save to Drafts\">Save to Drafts</a></td>";
-        $arr_html_output [] = "		</tr>";
     }
 
     $arr_html_output [] = "	</ul>";
