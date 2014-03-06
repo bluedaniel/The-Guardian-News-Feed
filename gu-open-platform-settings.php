@@ -57,7 +57,7 @@
  *
  */
 
-define('GUARDIAN_NEWS_FEED_VERSION', '0.4.2');
+define('GUARDIAN_NEWS_FEED_VERSION', '0.5');
 
 include('gu-open-platform-article-importer.php');
 include('gu-open-platform-related.php');
