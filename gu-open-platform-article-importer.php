@@ -241,12 +241,22 @@ function Guardian_ContentAPI_add_item($str_item_id) {
         }
 
         // Inlcude images if applicable
+        $imageArray = array();
         if (!empty($article['mediaAssets'])) {
             foreach ($article['mediaAssets'] as $media) {
                 if ($media['type'] == 'picture') {
-                    $postcontent .= "<img src=\"{$media['file']}\" class=\"aligncenter\" alt=\"{$media['fields']['caption']}\">";
+                    if($imageArray) {
+                        if($media['fields']['width'] > $imageArray['fields']['width']) {
+                            $imageArray = $media;
+                        }
+                    } else {
+                        $imageArray = $media;
+                    }
                 }
             }
+        }
+        if($imageArray) {
+            $postcontent .= "<img src=\"{$imageArray['fields']['secureFile']}\" class=\"aligncenter\" alt=\"{$imageArray['fields']['caption']}\">";
         }
 
         $postcontent .= $article ['fields'] ['body'];
