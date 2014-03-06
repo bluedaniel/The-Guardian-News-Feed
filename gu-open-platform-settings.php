@@ -57,8 +57,6 @@
  *
  */
 
-define('GUARDIAN_NEWS_FEED_VERSION', '0.5');
-
 include('gu-open-platform-article-importer.php');
 include('gu-open-platform-related.php');
 include("api". DIRECTORY_SEPARATOR ."gu-open-platform-api.php");
@@ -369,7 +367,6 @@ add_action('refresh_articles', 'Guardian_ContentAPI_refresh_articles');
  * Activate the scheduling
  */
 function activate_guardian_scheduling() {
-    update_option ('GUARDIAN_NEWS_FEED_VERSION', GUARDIAN_NEWS_FEED_VERSION);
     set_time_limit (0);
     Guardian_ContentAPI_refresh_articles(true, true);
     wp_schedule_event (time(), 'daily', 'refresh_articles');
