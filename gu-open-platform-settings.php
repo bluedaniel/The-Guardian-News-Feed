@@ -62,24 +62,23 @@ include('gu-open-platform-related.php');
 include("api". DIRECTORY_SEPARATOR ."gu-open-platform-api.php");
 
 define ('GUARD_DIR', dirname(__FILE__));
-define ('PREVIEW_KEY_MESSAGE', 'You are in <strong>preview mode</strong>.  This plugin requires an access key in order to publish articles from the Guardian. To get your access key <a href="%s" target="_blank">click here</a> and go through the registration process. You can then enter your key in the <a href="%s">plugin settings</a>.');
+define ('PREVIEW_KEY_MESSAGE', '<strong>A valid API key is required</strong>.<br>To get your access key <a href="%s" target="_blank">click here</a> and go through the registration process. You can then enter your key in the <a href="%s">plugin settings</a>.');
 define ('PREVIEW_KEY_MESSAGE_SETTINGS', admin_url('plugins?page=the-guardian-news-feed/gu-open-platform-settings.php'));
 define ('PREVIEW_KEY_MESSAGE_REGISTRATION', 'http://guardian.mashery.com/');
-define ('PREVIEW_KEY_MESSAGE_UPDATE', '<strong>Important Update:</strong> We have made changes to our API and existing users will have to <a href="%s" target="_blank">register for a new key</a>.');
+define ('PREVIEW_KEY_MESSAGE_UPDATE', '<br><strong>Note:</strong> If your old key has stopped working, it is because we have updated our API and you can <a href="%s" target="_blank">register for a new key here</a>.');
 
 function Guardian_OpenPlatform_settings_page() {
 
     $api = new GuardianOpenPlatformAPI();
 
     if (isset($_POST ['Submit'])) {
+
+        $newKey = trim(esc_attr($_POST [$api->guardian_api_keynameValue()]));
+
         // Save the posted value in the database
-        update_option ( $api->guardian_api_keynameValue(), trim(esc_attr($_POST [$api->guardian_api_keynameValue()])) );
+        update_option ( $api->guardian_api_keynameValue(), $newKey );
         update_option ( 'guardian_powered_image', trim(esc_attr($_POST ['guardian_powered_image'])) );
-        // Put an options updated message on the screen
         ?>
-        <div class="updated">
-            <p><strong><?php _e ( 'Your API key has been saved.' ); ?></strong></p>
-        </div>
     <?php
     }
     // Read in new or existing option value from database
@@ -90,18 +89,21 @@ function Guardian_OpenPlatform_settings_page() {
     ?>
     <div class="wrap">
         <h2>The Guardian News Feed Configuration</h2>
+
+        <p>If you have any questions, please have a look through the <a target="_blank" href="http://www.guardian.co.uk/open-platform/faq">FAQ</a> or post your question in the <a target="_blank" href="http://groups.google.com/group/guardian-api-talk">Google Group</a>.</p>
+
         <?php
         if (!empty($str_api_key)) {
             $status = $api->guardian_get_tier();
-            if (!empty($status)) {
-                echo '	<p style="padding: 0.5em; background-color: rgb(34, 221, 34); color: rgb(255, 255, 255); font-weight: bold;">This key is valid.</p>';
+            if ($status) {
+                echo sprintf( '<div class="updated"><p>%s</p></div>', 'You have a valid key.' );
+            } else {
+                echo sprintf( '<div class="error"><p><strong>%s</strong></p></div>', 'Your key is invalid, please <a target="_blank" href="http://guardian.mashery.com">register for a new one</a>.' );
             }
+        } else {
+            echo sprintf( '<div class="error"><p><strong>%s</strong></p></div>', 'You need a valid key to use this plugin, please <a target="_blank" href="http://guardian.mashery.com">register for one</a>.' );
         }
         ?>
-        <p>In order to publish Guardian articles on your blog we require that you <a target="_blank" href="http://guardian.mashery.com">register</a> and agree to the <a target="_blank" href="http://www.guardian.co.uk/open-platform/terms-and-conditions">Terms and Conditions</a>.</p>
-        <p>The process only takes a few moments.  If you have any questions, please have a look through the <a target="_blank" href="http://www.guardian.co.uk/open-platform/faq">FAQ</a> or post your question in the <a target="_blank" href="http://groups.google.com/group/guardian-api-talk">Google Group</a>.</p>
-        <p>An API key is not required for the 'Related Articles' sidebar widget included in this plugin, you can use it straight away.</p>
-
 
         <form name="form1" method="post" action="">
             <table class="form-table">
@@ -237,7 +239,7 @@ function Guardian_ContentAPI_refresh_articles($update_article = true, $activate 
                 } else {
 
                     // Article is fine and well
-                    $new_content = "<p><a href=\"{$arr_guard_article ['webUrl']}\"><img class=\"alignright\" src=\"http://image.guardian.co.uk/sys-images/Guardian/Pix/pictures/2010/03/01/poweredbyguardian".get_option ( 'guardian_powered_image' ).".png\" alt=\"Powered by Guardian.co.uk\" width=\"140\" height=\"45\" />This article titled \"{$arr_guard_article ['fields'] ['headline']}\" was written by {$arr_guard_article ['fields'] ['byline']}, for {$arr_guard_article ['fields'] ['publication']} on ".date("l jS F Y H.i e", strtotime($arr_guard_article ['webPublicationDate']))."</a></p>";
+                    $new_content = "<p><a href=\"{$arr_guard_article['webUrl']}\"><img class=\"alignright\" src=\"http://image.guardian.co.uk/sys-images/Guardian/Pix/pictures/2010/03/01/poweredbyguardian".get_option ('guardian_powered_image').".png\" alt=\"Powered by Guardian.co.uk\" width=\"140\" height=\"45\" />This article titled \"{$arr_guard_article['fields']['headline']}\" was written by {$arr_guard_article['fields']['byline']}, for {$arr_guard_article['fields']['publication']} on ".date("l jS F Y H.i e", strtotime($arr_guard_article ['webPublicationDate']))."</a></p>";
 
                     if (!empty($arr_guard_article['mediaAssets'])) {
                         foreach ($arr_guard_article['mediaAssets'] as $media) {
