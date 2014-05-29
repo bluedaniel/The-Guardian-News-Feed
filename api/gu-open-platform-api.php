@@ -18,6 +18,12 @@
 class GuardianOpenPlatformAPI {
 
     /**
+     * This is the endpoint of the Content API
+     * @var str
+     */
+    public static $GUARDIAN_API_ENDPOINT = "http://beta.content.guardianapis.com";
+
+    /**
      * Sets the Max Keywords because searching the API for too many terms will return an empty call
      * @var int
      */
@@ -48,7 +54,7 @@ class GuardianOpenPlatformAPI {
      * This is a url used to get the user tier status. This is a quick call returning one token result.
      * @var str
      */
-    public static $GUARDIAN_API_TIER_STATUS = "http://content.guardianapis.com/search?q=&format=json&page-size=1";
+    public static $GUARDIAN_API_TIER_STATUS = "/search?q=&format=json&page-size=1";
 
     /**
      * This is the search url to be used with a Sprintf function, returns the headline
@@ -58,14 +64,14 @@ class GuardianOpenPlatformAPI {
      *
      * @var str
      */
-    public static $GUARDIAN_API_SEARCH_URL = "http://content.guardianapis.com/search?";
+    public static $GUARDIAN_API_SEARCH_URL = "/search?";
 
     /**
      * The url for accessing just one article. Returns all available fields and tags.
      * API Key required for this url.
      * @var str
      */
-    public static $GUARDIAN_API_ITEM_URL = "http://content.guardianapis.com/%s?show-fields=all&show-tags=all&format=json";
+    public static $GUARDIAN_API_ITEM_URL = "/%s?show-fields=all&show-tags=all&format=json";
 
     /**
      * @var String $apikey Your Guardian API Key which is required to make calls to premium Guardian Content.
@@ -81,7 +87,7 @@ class GuardianOpenPlatformAPI {
      */
     public function guardian_get_tier() {
 
-        $str_api_url = self::$GUARDIAN_API_TIER_STATUS;
+        $str_api_url = self::$GUARDIAN_API_ENDPOINT . self::$GUARDIAN_API_TIER_STATUS;
 
         if (!empty($this->apikey)) {
 		    $str_api_url .= "&api-key=".$this->apikey;
@@ -99,7 +105,7 @@ class GuardianOpenPlatformAPI {
      */
     public function guardian_api_item($str_item_id) {
 
-        $str_api_url = self::$GUARDIAN_API_ITEM_URL;
+        $str_api_url = self::$GUARDIAN_API_ENDPOINT . self::$GUARDIAN_API_ITEM_URL;
 
         if (!empty($this->apikey)) {
 
@@ -133,7 +139,7 @@ class GuardianOpenPlatformAPI {
     	// Set the default encoding to be JSON.
     	$options['format'] = 'json';
 
-    	$str_api_url = self::$GUARDIAN_API_SEARCH_URL;
+    	$str_api_url = self::$GUARDIAN_API_ENDPOINT . self::$GUARDIAN_API_SEARCH_URL;
     	if (!empty($this->apikey)) {
 		    $str_api_url .= "&api-key=".$this->apikey;
     	}
