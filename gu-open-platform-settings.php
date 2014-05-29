@@ -274,17 +274,23 @@ function Guardian_ContentAPI_refresh_articles($update_article = true, $activate 
                 } else {
 
                     // Article is fine and well
-                    $new_content = "<p><a href=\"{$arr_guard_article ['webUrl']}\"><img class=\"alignright\" src=\"http://image.guardian.co.uk/sys-images/Guardian/Pix/pictures/2010/03/01/poweredbyguardian".get_option ( 'guardian_powered_image' ).".png\" alt=\"Powered by Guardian.co.uk\" width=\"140\" height=\"45\" />This article titled \"{$arr_guard_article ['fields'] ['headline']}\" was written by {$arr_guard_article ['fields'] ['byline']}, for {$arr_guard_article ['fields'] ['publication']} on ".date("l jS F Y H.i e", strtotime($arr_guard_article ['webPublicationDate']))."</a></p>";
+                    $new_content = array();
+                    $new_content[] = "<p><a href=\"{$arr_guard_article ['webUrl']}\">";
+                    $new_content[] = "<img class=\"alignright\" src=\"http://image.guardian.co.uk/sys-images/Guardian/Pix/pictures/2010/03/01/poweredbyguardian" . get_option('guardian_powered_image') . ".png\" alt=\"Powered by Guardian.co.uk\" width=\"140\" height=\"45\" />";
+                    $new_content[] = "This article titled \"{$arr_guard_article['fields']['headline']}\" was written by {$arr_guard_article['fields']['byline']}";
+                    $new_content[] = ", for {$arr_guard_article['fields']['publication']} on " . date("l jS F Y H.i e", strtotime($arr_guard_article['webPublicationDate']));
+                    $new_content[] = "</a></p>";
 
                     if (!empty($arr_guard_article['mediaAssets'])) {
                         foreach ($arr_guard_article['mediaAssets'] as $media) {
                             if ($media['type'] == 'picture') {
-                                $new_content .= "<img src=\"{$media['file']}\" class=\"aligncenter\" alt=\"{$media['fields']['caption']}\">";
+                                $new_content[] = "<img src=\"{$media['file']}\" class=\"aligncenter\" alt=\"{$media['fields']['caption']}\">";
                             }
                         }
                     }
-                    $new_content .= $arr_guard_article ['fields'] ['body'];
-                    $new_content .= "<p>guardian.co.uk &#169; Guardian News &amp; Media Limited 2010</p> <p>Published via the <a href=\"http://www.guardian.co.uk/open-platform/news-feed-wordpress-plugin\" target=\"_blank\" title=\"Guardian plugin page\">Guardian News Feed</a> <a href=\"http://wordpress.org/extend/plugins/the-guardian-news-feed/\" target=\"_blank\" title=\"Wordress plugin page\" >plugin</a> for WordPress.</p>";
+                    $new_content[] = $arr_guard_article['fields']['body'];
+                    $new_content[] = "<p>guardian.co.uk &#169; Guardian News &amp; Media Limited 2010</p> <p>Published via the <a href=\"http://www.guardian.co.uk/open-platform/news-feed-wordpress-plugin\" target=\"_blank\" title=\"Guardian plugin page\">Guardian News Feed</a> <a href=\"http://wordpress.org/extend/plugins/the-guardian-news-feed/\" target=\"_blank\" title=\"Wordress plugin page\" >plugin</a> for WordPress.</p>";
+                    $new_content = join("", $new_content);
                 }
                 $replace = guardian_article_replace($post['post_content'],  $new_content);
 
