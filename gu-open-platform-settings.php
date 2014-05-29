@@ -178,16 +178,6 @@ function retrieve_api_key($str_api_keyname, $required = false) {
     return $str_result;
 }
 
-/*
- * Function to replace the old content with the new.
- *
- * @param $content			Old Content from DB
- * @param $new_content		New content from the API
- */
-function guardian_article_replace( $content, $new_content ) {
-    return trim(preg_replace("/<!-- GUARDIAN WATERMARK -->.*?<!-- END GUARDIAN WATERMARK -->/s", "<!-- GUARDIAN WATERMARK -->{$new_content}<!-- END GUARDIAN WATERMARK -->", $content));
-}
-
 /**
  * This is the function that reloads the blog posts from the API
  *
@@ -237,19 +227,8 @@ function Guardian_ContentAPI_refresh_articles($update_article = true, $activate 
                     $new_content = "<p><strong>The content previously published here has been withdrawn.  We apologise for any inconvenience.</strong></p>";
                     $tagarray = array();
                 } else {
-
                     // Article is fine and well
-                    $new_content = "<p><a href=\"{$arr_guard_article['webUrl']}\"><img class=\"alignright\" src=\"http://image.guardian.co.uk/sys-images/Guardian/Pix/pictures/2010/03/01/poweredbyguardian".get_option ('guardian_powered_image').".png\" alt=\"Powered by Guardian.co.uk\" width=\"140\" height=\"45\" />This article titled \"{$arr_guard_article['fields']['headline']}\" was written by {$arr_guard_article['fields']['byline']}, for {$arr_guard_article['fields']['publication']} on ".date("l jS F Y H.i e", strtotime($arr_guard_article ['webPublicationDate']))."</a></p>";
-
-                    if (!empty($arr_guard_article['mediaAssets'])) {
-                        foreach ($arr_guard_article['mediaAssets'] as $media) {
-                            if ($media['type'] == 'picture') {
-                                $new_content .= "<img src=\"{$media['file']}\" class=\"aligncenter\" alt=\"{$media['fields']['caption']}\">";
-                            }
-                        }
-                    }
-                    $new_content .= $arr_guard_article ['fields'] ['body'];
-                    $new_content .= "<p>guardian.co.uk &#169; Guardian News &amp; Media Limited 2010</p> <p>Published via the <a href=\"http://www.guardian.co.uk/open-platform/news-feed-wordpress-plugin\" target=\"_blank\" title=\"Guardian plugin page\">Guardian News Feed</a> <a href=\"http://wordpress.org/extend/plugins/the-guardian-news-feed/\" target=\"_blank\" title=\"Wordress plugin page\" >plugin</a> for WordPress.</p>";
+                    $new_content = guardian_article_build($arr_guard_article);
                 }
                 $replace = guardian_article_replace($post['post_content'],  $new_content);
 
@@ -272,25 +251,8 @@ function Guardian_ContentAPI_refresh_articles($update_article = true, $activate 
                 if (empty($arr_guard_article ['fields'] ['body']) || $arr_guard_article ['fields'] ['body'] == '<!-- Redistribution rights for this field are unavailable -->') {
                     $new_content = "<p><strong>The content previously published here has been withdrawn.  We apologise for any inconvenience.</strong></p>";
                 } else {
-
                     // Article is fine and well
-                    $new_content = array();
-                    $new_content[] = "<p><a href=\"{$arr_guard_article ['webUrl']}\">";
-                    $new_content[] = "<img class=\"alignright\" src=\"http://image.guardian.co.uk/sys-images/Guardian/Pix/pictures/2010/03/01/poweredbyguardian" . get_option('guardian_powered_image') . ".png\" alt=\"Powered by Guardian.co.uk\" width=\"140\" height=\"45\" />";
-                    $new_content[] = "This article titled \"{$arr_guard_article['fields']['headline']}\" was written by {$arr_guard_article['fields']['byline']}";
-                    $new_content[] = ", for {$arr_guard_article['fields']['publication']} on " . date("l jS F Y H.i e", strtotime($arr_guard_article['webPublicationDate']));
-                    $new_content[] = "</a></p>";
-
-                    if (!empty($arr_guard_article['mediaAssets'])) {
-                        foreach ($arr_guard_article['mediaAssets'] as $media) {
-                            if ($media['type'] == 'picture') {
-                                $new_content[] = "<img src=\"{$media['file']}\" class=\"aligncenter\" alt=\"{$media['fields']['caption']}\">";
-                            }
-                        }
-                    }
-                    $new_content[] = $arr_guard_article['fields']['body'];
-                    $new_content[] = "<p>guardian.co.uk &#169; Guardian News &amp; Media Limited 2010</p> <p>Published via the <a href=\"http://www.guardian.co.uk/open-platform/news-feed-wordpress-plugin\" target=\"_blank\" title=\"Guardian plugin page\">Guardian News Feed</a> <a href=\"http://wordpress.org/extend/plugins/the-guardian-news-feed/\" target=\"_blank\" title=\"Wordress plugin page\" >plugin</a> for WordPress.</p>";
-                    $new_content = join("", $new_content);
+                    $new_content = guardian_article_build($arr_guard_article);
                 }
                 $replace = guardian_article_replace($post['post_content'],  $new_content);
 
@@ -326,6 +288,41 @@ function Guardian_ContentAPI_refresh_articles($update_article = true, $activate 
             }
         }
     }
+}
+
+/*
+ * Function to replace the old content with the new.
+ *
+ * @param $content			Old Content from DB
+ * @param $new_content		New content from the API
+ */
+function guardian_article_replace( $content, $new_content ) {
+    return trim(preg_replace("/<!-- GUARDIAN WATERMARK -->.*?<!-- END GUARDIAN WATERMARK -->/s", "<!-- GUARDIAN WATERMARK -->{$new_content}<!-- END GUARDIAN WATERMARK -->", $content));
+}
+
+/*
+ * Function to build the article from the API into a Wordpress Post.
+ *
+ * @param $arr_guard_article  Content from the API
+ */
+function guardian_article_build($arr_guard_article) {
+    $new_content = array();
+    $new_content[] = "<p><a href=\"{$arr_guard_article ['webUrl']}\">";
+    $new_content[] = "<img class=\"alignright\" src=\"http://image.guardian.co.uk/sys-images/Guardian/Pix/pictures/2010/03/01/poweredbyguardian" . get_option('guardian_powered_image') . ".png\" alt=\"Powered by Guardian.co.uk\" width=\"140\" height=\"45\" />";
+    $new_content[] = "This article titled \"{$arr_guard_article['fields']['headline']}\" was written by {$arr_guard_article['fields']['byline']}";
+    $new_content[] = ", for {$arr_guard_article['fields']['publication']} on " . date("l jS F Y H.i e", strtotime($arr_guard_article['webPublicationDate']));
+    $new_content[] = "</a></p>";
+
+    if (!empty($arr_guard_article['mediaAssets'])) {
+        foreach ($arr_guard_article['mediaAssets'] as $media) {
+            if ($media['type'] == 'picture') {
+                $new_content[] = "<img src=\"{$media['file']}\" class=\"aligncenter\" alt=\"{$media['fields']['caption']}\">";
+            }
+        }
+    }
+    $new_content[] = $arr_guard_article['fields']['body'];
+    $new_content[] = "<p>guardian.co.uk &#169; Guardian News &amp; Media Limited 2010</p> <p>Published via the <a href=\"http://www.guardian.co.uk/open-platform/news-feed-wordpress-plugin\" target=\"_blank\" title=\"Guardian plugin page\">Guardian News Feed</a> <a href=\"http://wordpress.org/extend/plugins/the-guardian-news-feed/\" target=\"_blank\" title=\"Wordress plugin page\" >plugin</a> for WordPress.</p>";
+    return join("", $new_content);
 }
 
 // JSON support
