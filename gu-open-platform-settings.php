@@ -62,6 +62,10 @@ include('gu-open-platform-related.php');
 include("api". DIRECTORY_SEPARATOR ."gu-open-platform-api.php");
 
 define ('GUARD_DIR', dirname(__FILE__));
+define ('PREVIEW_KEY_MESSAGE', 'You are in <strong>preview mode</strong>.  This plugin requires an access key in order to publish articles from the Guardian. To get your access key <a href="%s" target="_blank">click here</a> and go through the registration process. You can then enter your key in the <a href="%s">plugin settings</a>.');
+define ('PREVIEW_KEY_MESSAGE_SETTINGS', admin_url('plugins?page=the-guardian-news-feed/gu-open-platform-settings.php'));
+define ('PREVIEW_KEY_MESSAGE_REGISTRATION', 'http://guardian.mashery.com/');
+define ('PREVIEW_KEY_MESSAGE_UPDATE', '<strong>Important Update:</strong> We have made changes to our API and existing users will have to <a href="%s" target="_blank">register for a new key</a>.');
 
 function Guardian_OpenPlatform_settings_page() {
 

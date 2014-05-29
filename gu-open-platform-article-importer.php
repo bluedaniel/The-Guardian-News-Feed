@@ -205,7 +205,7 @@ function Guardian_ContentAPI_add_item($str_item_id) {
 
     if ($tier == 'Free') {
         $message[] = "<div class=\"error\">";
-        $message[] = "	<p>You are in <strong>preview mode</strong>.  This plugin requires an access key in order to publish articles from the Guardian. To get your access key <a href=\"http://guardian.mashery.com/\">click here</a> and go through the registration process. You can then enter your key in the <a href=\"" . admin_url('plugins?page=the-guardian-news-feed/gu-open-platform-settings.php') . "\">plugin settings</a>.</p>";
+        $message[] = "<p>" . sprintf('You will need a valid key to publish, you can <a href="%s" target="_blank">register for one here.', PREVIEW_KEY_MESSAGE_REGISTRATION) . "</p>";
         $message[] = "</div>";
         return implode("\n", $message);
     }
@@ -314,10 +314,8 @@ function Guardian_Published_Already ($str_item_id) {
  * @param $tier				String of tier.
  */
 function guardian_can_user_publish( $tier = '' ) {
-    $api_request_link = "http://guardian.mashery.com/";
-
     if ( empty($tier) || $tier == 'free') {
-        $error = new WP_Error('error', __("<div class=\"error\"><p>You are in <strong>preview mode</strong>.  This plugin requires an access key in order to publish articles from the Guardian. To get your access key <a href=\"{$api_request_link}\">click here</a> and go through the registration process. You can then enter your key in the <a href=\"" . admin_url('plugins?page=the-guardian-news-feed/gu-open-platform-settings.php') . "\">plugin settings</a>.</p></div>"));
+        $error = new WP_Error('error', __("<div class=\"error\"><p>" . sprintf(PREVIEW_KEY_MESSAGE, PREVIEW_KEY_MESSAGE_REGISTRATION, PREVIEW_KEY_MESSAGE_SETTINGS) . "</p><p>" . sprintf(PREVIEW_KEY_MESSAGE_UPDATE, PREVIEW_KEY_MESSAGE_REGISTRATION) . "</p></div>"));
         echo $error->get_error_message();
     }
 }
