@@ -69,6 +69,30 @@ function Guardian_ContentAPI_admin_page() {
     global $s, $tag, $section, $page, $safe_url;
     ?>
     <div class="wrap">
+
+      <style>
+      .githubLink, .settingsLink {
+        float:right;
+      }
+      .settingsLink {
+        margin-right: 10px;
+      }
+      .githubLink:before, .settingsLink:before {
+        content:"\f475";
+        display: inline-block;
+        -webkit-font-smoothing: antialiased;
+        font: normal 18px/1 'dashicons';
+        vertical-align: top;
+        margin-right: 3px;
+      }
+      .settingsLink:before {
+        content:"\f107";
+      }
+      </style>
+
+        <p class="githubLink"><a href="https://github.com/bluedaniel/The-Guardian-News-Feed">GitHub</a></p>
+        <p class="settingsLink"><a href="<?php echo PREVIEW_KEY_MESSAGE_SETTINGS ?>">Settings</a></p>
+
         <h2>The Guardian News Feed</h2>
 
         <?php
