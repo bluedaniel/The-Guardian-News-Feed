@@ -63,7 +63,7 @@ include("api". DIRECTORY_SEPARATOR ."gu-open-platform-api.php");
 
 define ('GUARD_DIR', dirname(__FILE__));
 define ('PREVIEW_KEY_MESSAGE', '<strong>A valid API key is required</strong>.<br>To get your access key <a href="%s" target="_blank">click here</a> and go through the registration process. You can then enter your key in the <a href="%s">plugin settings</a>.');
-define ('PREVIEW_KEY_MESSAGE_SETTINGS', admin_url('plugins?page=the-guardian-news-feed/gu-open-platform-settings.php'));
+define ('PREVIEW_KEY_MESSAGE_SETTINGS', admin_url('options-general.php?page=the-guardian-news-feed/gu-open-platform-settings.php'));
 define ('PREVIEW_KEY_MESSAGE_REGISTRATION', 'http://guardian.mashery.com/');
 define ('PREVIEW_KEY_MESSAGE_UPDATE', '<br><strong>Note:</strong> If your old key has stopped working, it is because we have updated our API and you can <a href="%s" target="_blank">register for a new key here</a>.');
 
@@ -360,7 +360,7 @@ if ( !guardian_id_got_json() ) {
 function Guardian_OpenPlatform_add_pages() {
     global $wpdb;
     if (function_exists ( "add_submenu_page" )) {
-        add_submenu_page('plugins.php', __('The Guardian News Feed Configuration'), __('The Guardian News Feed Configuration'), 'manage_options', __FILE__, 'Guardian_OpenPlatform_settings_page');
+        add_submenu_page('options-general.php', __('Guardian News Feed'), __('Guardian News Feed'), 'manage_options', __FILE__, 'Guardian_OpenPlatform_settings_page');
     }
 }
 // Plugin admin menus
