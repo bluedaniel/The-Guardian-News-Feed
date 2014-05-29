@@ -67,6 +67,11 @@ class GuardianOpenPlatformAPI {
     public static $GUARDIAN_API_SEARCH_URL = "/search?";
 
     /**
+     * This is the sections url to be used with a Sprintf function
+     */
+    public static $GUARDIAN_API_SECTIONS_URL = "/sections?";
+
+    /**
      * The url for accessing just one article. Returns all available fields and tags.
      * API Key required for this url.
      * @var str
@@ -94,6 +99,10 @@ class GuardianOpenPlatformAPI {
     	}
 
     	$arr_api_result = $this->convertJson( $str_api_url );
+
+      if ($arr_api_result ['response']['status'] !== 'ok') {
+        return false;
+      }
     	$str_tier = ucfirst(strtolower($arr_api_result ['response']['userTier']));
     	return $str_tier;
     }
@@ -134,7 +143,9 @@ class GuardianOpenPlatformAPI {
     public function guardian_api_search( $options = null, $random = false ) {
 
     	// Validate keywords - ( url encoding, keyword limits, etc )
-    	$options['q'] = $this->guardian_valdiate_api_search_terms( $options['q'], $random );
+      if($options['q']) {
+      	$options['q'] = $this->guardian_valdiate_api_search_terms( $options['q'], $random );
+      }
 
     	// Set the default encoding to be JSON.
     	$options['format'] = 'json';
@@ -150,6 +161,28 @@ class GuardianOpenPlatformAPI {
 
     	$arr_api_result = $this->convertJson( $str_api_url );
     	return $arr_api_result ['response'];
+    }
+
+    /**
+     * Calls the Guardian API section search
+     *
+     */
+    public function guardian_api_sections( ) {
+
+      // Set the default encoding to be JSON.
+      $options['format'] = 'json';
+
+      $str_api_url = self::$GUARDIAN_API_ENDPOINT . self::$GUARDIAN_API_SECTIONS_URL;
+      if (!empty($this->apikey)) {
+        $str_api_url .= "&api-key=".$this->apikey;
+      }
+
+      foreach ( $options as $key => $value ) {
+        $str_api_url .= "&".$key."=".$value;
+      }
+
+      $arr_api_result = $this->convertJson( $str_api_url );
+      return $arr_api_result ['response'];
     }
 
     /**
@@ -178,7 +211,7 @@ class GuardianOpenPlatformAPI {
      */
     public function convertJson ($str_api_url) {
     	$data = wp_remote_retrieve_body( wp_remote_get($str_api_url) );
-		return ( json_decode($data, true) );
+		  return ( json_decode($data, true) );
     }
 
 }

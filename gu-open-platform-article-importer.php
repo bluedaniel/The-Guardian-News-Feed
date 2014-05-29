@@ -50,11 +50,19 @@ if(isset($_GET['s'])) {
 if(isset($_GET['tag'])) {
     $tag = esc_attr($_GET['tag']);
 }
+$section = '';
 if(isset($_GET['section'])) {
     $section = esc_attr($_GET['section']);
 }
+$p = 1;
+if(isset($_GET['p'])) {
+    $p = esc_attr($_GET['p']);
+}
 if(isset($_GET['page'])) {
     $page = esc_attr($_GET['page']);
+}
+if(isset($_GET['contentid'])) {
+  $contentid = esc_attr($_GET ['contentid']);
 }
 $safe_url = esc_url($_SERVER['PHP_SELF']);
 
@@ -66,7 +74,7 @@ $safe_url = esc_url($_SERVER['PHP_SELF']);
  *
  */
 function Guardian_ContentAPI_admin_page() {
-    global $s, $tag, $section, $page, $safe_url;
+    global $s, $tag, $section, $page, $p, $safe_url, $contentid;
     ?>
     <div class="wrap">
 
@@ -88,6 +96,15 @@ function Guardian_ContentAPI_admin_page() {
       .settingsLink:before {
         content:"\f107";
       }
+      .plugins td {
+        border-bottom: 1px solid #efefef;
+      }
+      .article-meta {
+        margin-top: 7px;
+        color: #888;
+        font-size: 12px;
+        font-style: italic;
+      }
       </style>
 
         <p class="githubLink"><a href="https://github.com/bluedaniel/The-Guardian-News-Feed">GitHub</a></p>
@@ -102,37 +119,71 @@ function Guardian_ContentAPI_admin_page() {
 
         $api = new GuardianOpenPlatformAPI($str_api_key);
 
+        $tier = $api->guardian_get_tier();
+
+        if (!$tier) {
+          render_register_message();
+          echo "</div>"; // end of #wrap
+          return;
+        }
+
+        $sectionData = $api->guardian_api_sections();
+        $sectionResults = $sectionData['results'];
+
+        $sectionOptions = array();
+        foreach ($sectionResults as $topic) {
+          $sectionOptions[$topic['id']] = $topic['webTitle'];
+        }
+        $sectionOptions[''] = 'All sections';
+        asort($sectionOptions);
+
         $options = array(
-            'q' => $_GET['s'],
-            'tag' => $_GET['tag'],
-            'section' => $_GET['section'],
             'format' => 'json',
-            'page' => $_GET['p'],
-            'show-fields' => 'headline,standfirst,trail-text,thumbnail',
-            //'show-refinements' => 'all'
+            'show-fields' => 'headline,standfirst,trail-text,thumbnail,byline',
+            'show-tags' => 'keyword',
+            'page' => $p
         );
 
+        if ($s) {
+          $options['q'] = $s;
+        }
+        if ($tag) {
+          $options['tag'] = $tag;
+        }
+        if ($section) {
+          $options['section'] = $section;
+        }
         $articles = $api->guardian_api_search($options);
 
-        guardian_can_user_publish($articles['userTier']);
-        $contentid = esc_attr($_GET ['contentid']);
         if (!empty($contentid)) {
             $message = Guardian_ContentAPI_add_item( $contentid );
             if (!empty($message)) {
                 echo $message;
             }
         }
+
+
         ?>
         <p>Want news? Find something you like below, click 'Save to Drafts' and then publish away.</p>
 
         <form action="<?php echo $safe_url ?>" method="get" id="search-plugins">
 
-            <input type="text" value="<?php echo $s ?>" name="s" size="50">
+            <input type="text" value="<?php echo $s ?>" name="s" size="30" placeholder="Search terms ... ">
             <label for="plugin-search-input" class="screen-reader-text">Search</label>
             <input type="hidden" name="tag" value="<?php echo $tag ?>">
-            <input type="hidden" name="section" value="<?php echo $section ?>">
             <input type="hidden" name="page" value="<?php echo $page ?>">
-            <input type="submit" class="button" value="Search Articles">
+            <select name="section" id="section">
+              <?php
+              foreach($sectionOptions as $key => $val) {
+                $selected = "";
+                if($key === $section) {
+                  $selected = "selected=\"selected\"";
+                }
+                echo "<option value=\"{$key}\" {$selected}>{$val}</option>";
+              }
+              ?>
+            </select>
+            <input type="submit" class="button" value="Search">
 
         </form>
 
@@ -141,8 +192,7 @@ function Guardian_ContentAPI_admin_page() {
 
         $headfoot = array();
         $headfoot[] = "<th class=\"thumb\" scope=\"col\">Thumbnail</th>";
-        $headfoot[] = "<th class=\"name\" scope=\"col\">Headline</th>";
-        $headfoot[] = "<th class=\"num\" scope=\"col\">Published</th>";
+        $headfoot[] = "<th class=\"name\" scope=\"col\" style=\"min-width: 200px;\">Headline</th>";
         $headfoot[] = "<th class=\"desc\" scope=\"col\">Description</th>";
         $headfoot[] = "<th class=\"action-links\" scope=\"col\">Actions</th>";
 
@@ -337,11 +387,9 @@ function Guardian_Published_Already ($str_item_id) {
  *
  * @param $tier				String of tier.
  */
-function guardian_can_user_publish( $tier = '' ) {
-    if ( empty($tier) || $tier == 'free') {
-        $error = new WP_Error('error', __("<div class=\"error\"><p>" . sprintf(PREVIEW_KEY_MESSAGE, PREVIEW_KEY_MESSAGE_REGISTRATION, PREVIEW_KEY_MESSAGE_SETTINGS) . "</p><p>" . sprintf(PREVIEW_KEY_MESSAGE_UPDATE, PREVIEW_KEY_MESSAGE_REGISTRATION) . "</p></div>"));
-        echo $error->get_error_message();
-    }
+function render_register_message() {
+    $error = new WP_Error('error', __("<div class=\"error\"><p>" . sprintf(PREVIEW_KEY_MESSAGE, PREVIEW_KEY_MESSAGE_REGISTRATION, PREVIEW_KEY_MESSAGE_SETTINGS) . "</p><p>" . sprintf(PREVIEW_KEY_MESSAGE_UPDATE, PREVIEW_KEY_MESSAGE_REGISTRATION) . "</p></div>"));
+    echo $error->get_error_message();
 }
 
 /**
@@ -369,8 +417,7 @@ function render_contentapi_search($arr_related_content) {
             $arr_html_output [] = "		<tr>";
             $arr_html_output [] = "			<td class=\"thumb\">{$image}</td>";
             $arr_html_output [] = "			<td class=\"name\"><a href=\"{$related_content ['webUrl']}\" alt=\"{$related_content ['fields'] ['headline']}\" title=\"{$related_content ['fields'] ['headline']}\" target=\"_blank\">{$related_content ['fields'] ['headline']}</a></td>";
-            $arr_html_output [] = "			<td class=\"vers\">".date("j/m/Y", strtotime($related_content ['webPublicationDate']))."</td>";
-            $arr_html_output [] = "			<td class=\"desc\">{$description}</td>";
+            $arr_html_output [] = "			<td class=\"desc\">{$description}<div class=\"article-meta\"><span class=\"date\">Published ".date("j/m/Y", strtotime($related_content ['webPublicationDate']))." by {$related_content ['fields'] ['byline']}</div></td>";
             $arr_html_output [] = "			<td class=\"action-links\">";
             $arr_html_output [] = "			<a href=\"{$link}\" alt=\"Save to Drafts\">Save to Drafts</a></td>";
             $arr_html_output [] = "		</tr>";
@@ -572,6 +619,7 @@ function Guardian_ContentAPI_add_pages() {
         add_submenu_page ( "post.php", __ ( "Guardian News Feed" ), __ ( "Guardian News Feed" ), 2, __FILE__, "Guardian_ContentAPI_admin_page" );
     }
 }
+
 
 // Plugin admin menus
 add_action ( "admin_menu", "Guardian_ContentAPI_add_pages" );
