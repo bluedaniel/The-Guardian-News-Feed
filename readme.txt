@@ -63,6 +63,10 @@ There is a Google Group where you can post questions here:
 
 == Changelog ==
 
+= 1.1 =
+* Added ordering options.
+* Preparing to add an 'advanced search' feature
+
 = 1.0 =
 * Updated the API to v2
 * Added section filters
