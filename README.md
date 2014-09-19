@@ -24,8 +24,6 @@ When publishing articles from the Guardian, please adhere to our publishing guid
 
 - Key. If you don't have a key, get one here: http://www.guardian.co.uk/open-platform.  It's required.  If you do have one, please don't share it or use it anywhere else.
 
-- Ads. Articles come with ads and performance tracking embedded in them. As above, you mustn't change or remove them. You can, of course, use your own ads elsewhere on your blog, too.
-
 - Deletions. Sometimes but very rarely we have to remove articles. When that happens, this plug-in will replace the Guardian content within your blog post with a message saying that the content is not available anymore.
 
 Important Notes
