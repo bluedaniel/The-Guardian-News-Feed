@@ -21,7 +21,7 @@ class GuardianOpenPlatformAPI {
      * This is the endpoint of the Content API
      * @var str
      */
-    public static $GUARDIAN_API_ENDPOINT = "http://beta.content.guardianapis.com";
+    public static $GUARDIAN_API_ENDPOINT = "http://content.guardianapis.com";
 
     /**
      * Sets the Max Keywords because searching the API for too many terms will return an empty call
@@ -54,7 +54,7 @@ class GuardianOpenPlatformAPI {
      * This is a url used to get the user tier status. This is a quick call returning one token result.
      * @var str
      */
-    public static $GUARDIAN_API_TIER_STATUS = "/search?q=&format=json&page-size=1";
+    public static $GUARDIAN_API_TIER_STATUS = "/search?format=json&page-size=1";
 
     /**
      * This is the search url to be used with a Sprintf function, returns the headline
@@ -145,6 +145,8 @@ class GuardianOpenPlatformAPI {
     	// Validate keywords - ( url encoding, keyword limits, etc )
       if($options['q']) {
       	$options['q'] = $this->guardian_valdiate_api_search_terms( $options['q'], $random );
+      } else {
+        unset($options['q']);
       }
 
     	// Set the default encoding to be JSON.
