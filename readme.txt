@@ -5,7 +5,7 @@ Donate link:
 Tags: news
 Requires at least: 2.8
 Tested up to: 3.9.1
-Stable tag: 1.1
+Stable tag: 1.2
 
 The Guardian News Feed plug-in enables you to publish articles by the Guardian directly to your blog.
 
@@ -62,6 +62,9 @@ There is a Google Group where you can post questions here:
 <a href="http://open-platform.theguardian.com">http://open-platform.theguardian.com</a>
 
 == Changelog ==
+
+= 1.2 =
+* Major bug fix regarding Content API not accepting empty 'q' parameter
 
 = 1.1 =
 * Added ordering options.

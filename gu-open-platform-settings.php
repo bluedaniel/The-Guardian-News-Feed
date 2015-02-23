@@ -5,7 +5,7 @@
  * Plugin URI: http://www.guardian.co.uk/open-platform
  * Description: Publish articles and related links from the Guardian directly to your blog.
  * Author: Daniel Levitt for Guardian News and Media Ltd
- * Version: 1.1
+ * Version: 1.2
  * Author URI: http://www.guardian.co.uk/open-platform
  */
 
